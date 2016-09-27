@@ -25,7 +25,7 @@
   </div>
 
   <h2>Base Cards</h2>
-  {% for i in range(10) %}
+  {% for i in range(12) %}
   <div class="card-group" style="display: inline-block">
     <img id="card{{i}}img" src="/static/cards/card_back.jpg" width="150"/>
     <br>
@@ -42,7 +42,42 @@
   </datalist>
 
   <h2>Events</h2>
-  <input type="submit" value="Create Kingdom"></input>
+  {% for i in range(3) %}
+  <div class="card-group" style="display: inline-block">
+    <img id="event{{i}}img" src="/static/cards/card_back.jpg" width="150"/>
+    <br>
+    <input id="event{{i}}" type="text" name="event-{{i}}" list="events" placeholder="Start typing..." onchange="onSelectCard(event)"></input>
+  </div>
+  {% endfor %}
+
+  <datalist id="events">
+    {% for card in cards %}
+      {% if card.type in ["event"] %}
+        <option value="{{ card.name }}">{{ card.name }}</option>
+      {% endif %}
+    {% endfor %}
+  </datalist>
+
+  <h2>Landmarks</h2>
+  {% for i in range(3) %}
+  <div class="card-group" style="display: inline-block">
+    <img id="landmark{{i}}img" src="/static/cards/card_back.jpg" width="150"/>
+    <br>
+    <input id="landmark{{i}}" type="text" name="landmark-{{i}}" list="landmarks" placeholder="Start typing..." onchange="onSelectCard(event)"></input>
+  </div>
+  {% endfor %}
+
+  <datalist id="landmarks">
+    {% for card in cards %}
+      {% if card.type in ["landmark"] %}
+        <option value="{{ card.name }}">{{ card.name }}</option>
+      {% endif %}
+    {% endfor %}
+  </datalist>
+
+  <div class="row">
+    <input type="submit" value="Create Kingdom"></input>
+  </div>
 </form>
 {% endblock %}
 

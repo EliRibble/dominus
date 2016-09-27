@@ -1,9 +1,11 @@
 import collections
-import flask
 import functools
 import json
-import dominus.platform
 import logging
+
+import flask
+
+import dominus.platform
 
 LOGGER = logging.getLogger(__name__)
 
@@ -47,8 +49,8 @@ def admin():
 
 @blueprint.route('/kingdoms/', methods=['GET'])
 def kingdoms():
-    kingdoms = dominus.platform.get_kingdoms()
-    return flask.render_template('kingdoms.html', kingdoms=kingdoms)
+    _kingdoms = dominus.platform.get_kingdoms()
+    return flask.render_template('kingdoms.html', kingdoms=_kingdoms)
 
 @blueprint.route('/kingdom/add/', methods=['GET'])
 def add_kingdom_get():
@@ -64,10 +66,9 @@ def add_kingdom_post(arguments):
     LOGGER.debug("Got POST %s", arguments)
     cards = []
     for key, value in flask.request.form.items():
-        if not key.startswith('card'):
+        if key in ['name', 'creator']:
             continue
         cards.append(value)
     cards = [card for card in cards if card]
     dominus.platform.create_kingdom(arguments['name'], arguments['creator'], cards)
     return flask.redirect('/kingdoms/')
-
