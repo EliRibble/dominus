@@ -1,7 +1,10 @@
-import logging
 import collections
-import sqlalchemy
+import datetime
+import logging
+
 import chryso.connection
+import sqlalchemy
+
 import dominus.tables
 
 LOGGER = logging.getLogger(__name__)
@@ -19,7 +22,7 @@ def create_card(set_, name, type_):
         type=type_,
     )
     engine.execute(query)
-    LOGGER.debug("Created %s in %s", card, set_['name'])
+    LOGGER.debug("Created %s in %s", name, set_['name'])
 
 def create_kingdom(name, creator, cards):
     engine = chryso.connection.get()
@@ -79,7 +82,7 @@ def get_kingdoms():
         card_uuid = row[dominus.tables.KingdomCard.c.card]
         card = cards_by_uuid[card_uuid]
         cards_by_kingdom_uuid[kingdom].append(card)
-    query = sqlalchemy.select([dominus.tables.Kingdom])
+    query = sqlalchemy.select([dominus.tables.Kingdom]).where(dominus.tables.Kingdom.c.deleted == None)
     rows = engine.execute(query).fetchall()
     kingdoms = [Kingdom(
         cards   = cards_by_kingdom_uuid[row[dominus.tables.Kingdom.c.uuid]],
@@ -88,3 +91,9 @@ def get_kingdoms():
         uuid    = row[dominus.tables.Kingdom.c.uuid],
     ) for row in rows]
     return kingdoms
+
+def delete_kingdom(uuid):
+    engine = chryso.connection.get()
+    query = dominus.tables.Kingdom.update().values(deleted=datetime.datetime.utcnow()).where(dominus.tables.Kingdom.c.uuid == uuid)
+    engine.execute(query)
+    LOGGER.debug("Deleted kingdom %s", uuid)

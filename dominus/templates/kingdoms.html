@@ -13,6 +13,10 @@
       <li style="display: inline-block"><img src="/static/cards/{{card.name}}.jpg" width="150"/></li>
     {% endfor %}
   </ul>
+  <form action="/kingdom/delete/" method="POST">
+    <input type="hidden" name="uuid" value="{{ kingdom.uuid }}"/>
+    <input type="submit" value="Delete"/>
+  </form>
 </div>
 {% endfor %}
 {% endblock %}

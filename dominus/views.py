@@ -2,6 +2,7 @@ import collections
 import functools
 import json
 import logging
+import uuid
 
 import flask
 
@@ -71,4 +72,10 @@ def add_kingdom_post(arguments):
         cards.append(value)
     cards = [card for card in cards if card]
     dominus.platform.create_kingdom(arguments['name'], arguments['creator'], cards)
+    return flask.redirect('/kingdoms/')
+
+@blueprint.route('/kingdom/delete/', methods=['POST'])
+@parse({'uuid' : uuid.UUID})
+def kingdom_delete(arguments):
+    dominus.platform.delete_kingdom(arguments['uuid'])
     return flask.redirect('/kingdoms/')
