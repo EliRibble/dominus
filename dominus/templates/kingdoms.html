@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% block javascript %}
+{% endblock %}
+
+{% block main_content %}
+<h1>Kingdoms</h1>
+{% for kingdom in kingdoms %}
+<div class="kingdom">
+  <h2>{{ kingdom.name }}</h2>
+  <h3>Creator: {{ kingdom.creator }}</h3>
+  <ul>
+    {% for card in kingdom.cards %}
+      <li style="display: inline-block"><img src="/static/cards/{{card.name}}.jpg" width="150"/></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endfor %}
+{% endblock %}

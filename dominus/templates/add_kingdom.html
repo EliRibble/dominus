@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% block javascript %}
+<script type="application/javascript">
+  function onSelectCard(e) {
+    var img = document.getElementById(e.target.id + 'img');
+    img.src = '/static/cards/' + e.target.value + '.jpg';
+  }
+  console.log('loaded');
+</script>
+{% endblock %}
+
+{% block main_content %}
+<h1>Add Kingdom</h1>
+<form method="POST" action="/kingdom/add/">
+  <div class="row">
+    <div class="six columns">
+      <label for="name">Kingdom Name</label>
+      <input id="name" type="text" name="name" placeholder="My kingdome"></input>
+    </div>
+
+    <div class="six columns">
+      <label for="creator">Creator</label>
+      <input id="creator" type="text" name="creator" placeholder="Leeroy Jenkins"></input>
+    </div>
+  </div>
+
+  <h2>Base Cards</h2>
+  {% for i in range(10) %}
+  <div class="card-group" style="display: inline-block">
+    <img id="card{{i}}img" src="/static/cards/card_back.jpg" width="150"/>
+    <br>
+    <input id="card{{i}}" type="text" name="card-{{i}}" list="basecards" placeholder="Start typing..." onchange="onSelectCard(event)"></input>
+  </div>
+  {% endfor %}
+
+  <datalist id="basecards">
+    {% for card in cards %}
+      {% if not card.type in ["event"] %}
+        <option value="{{ card.name }}">{{ card.name }}</option>
+      {% endif %}
+    {% endfor %}
+  </datalist>
+
+  <h2>Events</h2>
+  <input type="submit" value="Create Kingdom"></input>
+</form>
+{% endblock %}
+

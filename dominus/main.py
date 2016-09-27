@@ -23,8 +23,7 @@ def run():
         SECRET_KEY = 'development key',
     ))
 
-    app.route('/')(dominus.views.root)
-    app.route('/admin/')(dominus.views.admin)
+    app.register_blueprint(dominus.views.blueprint)
 
     try:
         app.run(host='localhost', port=4554, debug=True)
