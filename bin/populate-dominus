@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import dominus.main
+import dominus.platform
+
+SETS = (
+    'adventures',
+    'base',
+    'dark ages',
+    'empires',
+    'hinterlands',
+    'prosperity',
+    'guilds',
+    'cornucopia',
+    'alchemy',
+    'seaside',
+)
+
+Card = dominus.platform.Card
+CARDS = {
+    'dark ages': (
+        Card('poor house', 'action'),
+        Card('forager', 'action'),
+        Card('market square', 'action/reaction'),
+        Card('hunting grounds', 'action'),
+    ),
+    'empires': (
+        Card('advance', 'event'),
+        Card('catacombs', 'action'),
+        Card('city quarter', 'action'),
+        Card('emporium', 'action'),
+        Card('enchantress', 'action/attack/duration'),
+        Card('patrician', 'action'),
+        Card('legionairy', 'action/attack'),
+        Card('villa', 'action'),
+    ),
+}
+def main():
+    dominus.main.setup_db()
+
+    create_sets()
+    create_cards()
+
+def create_sets():
+    all_sets = dominus.platform.get_sets()
+    set_names = {_set['name'] for _set in all_sets}
+    to_create = set(SETS).difference(set_names)
+    for _set in to_create:
+        dominus.platform.create_set(_set)
+
+def create_cards():
+    all_cards = dominus.platform.get_cards()
+    all_sets = dominus.platform.get_sets()
+    sets_by_name = {_set['name']: _set for _set in all_sets}
+    card_names = {card['name'] for card in all_cards}
+    for _set, cards in CARDS.items():
+        _set = sets_by_name[_set]
+        for card in cards:
+            if card.name in card_names:
+                continue
+            dominus.platform.create_card(_set, card)
+
+if __name__ == '__main__':
+    main()

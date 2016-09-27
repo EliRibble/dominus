@@ -1,0 +1,16 @@
+<html>
+<h1>Dominus Admin</h1>
+<h2>Sets</h2>
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Box</th>
+  </tr>
+  {% for s in sets %}
+  <tr>
+    <td>{{s.name}}</td>
+    <td><img src="/static/sets/{{s.name}}.jpg" width="100"/></td>
+  </tr>
+  {% endfor %}
+</table>
+</html>
