@@ -100,6 +100,7 @@ def main():
             'sdist'         : CustomSDistCommand,
         },
         install_requires    = [
+            'chryso==1.10',
             'Flask==0.11.1',
         ],
         extras_require={
