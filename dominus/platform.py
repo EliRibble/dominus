@@ -10,19 +10,36 @@ import dominus.tables
 LOGGER = logging.getLogger(__name__)
 
 Set = collections.namedtuple('Set', ('name', 'uuid'))
-Card = collections.namedtuple('Card', ('name', 'type', 'set', 'uuid'))
+Card = collections.namedtuple('Card', (
+    'cost_in_debt',
+    'cost_in_treasure',
+    'is_in_supply',
+    'name',
+    'set',
+    'types',
+    'text',
+    'uuid',
+))
 Kingdom = collections.namedtuple('Kingdom', ('name', 'creator', 'cards', 'uuid'))
 
-def create_card(set_, name, type_):
+def create_card(set_, name, cardtypes, cost_in_treasure, cost_in_debt, is_in_supply):
     engine = chryso.connection.get()
     query = dominus.tables.Card.insert().values(
-        name=name,
-        set=set_['uuid'],
-        text='',
-        type=type_,
+        cost_in_debt        = cost_in_debt,
+        cost_in_treasure    = cost_in_treasure,
+        is_in_supply        = is_in_supply,
+        name                = name,
+        set                 = set_.uuid,
+        text                = '',
     )
+    results = engine.execute(query)
+    uuid = results.inserted_primary_key[0]
+    query = dominus.tables.CardType.insert().values([dict(
+        card=uuid,
+        name=cardtype,
+    ) for cardtype in cardtypes])
     engine.execute(query)
-    LOGGER.debug("Created %s in %s", name, set_['name'])
+    LOGGER.debug("Created %s in %s with types %s", name, set_.name, cardtypes)
 
 def create_kingdom(name, creator, cards):
     engine = chryso.connection.get()
@@ -59,14 +76,24 @@ def get_sets():
 def get_cards():
     engine = chryso.connection.get()
 
+    query = sqlalchemy.select([dominus.tables.CardType])
+    rows = engine.execute(query).fetchall()
+    types_by_uuid = collections.defaultdict(list)
+    for row in rows:
+        types_by_uuid[row[dominus.tables.CardType.c.card]].append(row[dominus.tables.CardType.c.name])
+
     query = sqlalchemy.select([dominus.tables.Card])
 
     rows = engine.execute(query).fetchall()
     return [Card(
-        name = row[dominus.tables.Card.c.name],
-        set  = row[dominus.tables.Card.c.set],
-        type = row[dominus.tables.Card.c.type],
-        uuid = row[dominus.tables.Card.c.uuid],
+        cost_in_debt     = row[dominus.tables.Card.c.cost_in_debt],
+        cost_in_treasure = row[dominus.tables.Card.c.cost_in_treasure],
+        is_in_supply     = row[dominus.tables.Card.c.is_in_supply],
+        name             = row[dominus.tables.Card.c.name],
+        set              = row[dominus.tables.Card.c.set],
+        text             = row[dominus.tables.Card.c.text],
+        types            = set(types_by_uuid[row[dominus.tables.Card.c.uuid]]),
+        uuid             = row[dominus.tables.Card.c.uuid],
     ) for row in rows]
 
 def get_kingdoms():
