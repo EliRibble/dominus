@@ -1,0 +1,21 @@
+from chryso.schema import BaseEnum
+
+class CardType(BaseEnum):
+    action   = 'action'
+    attack   = 'attack'
+    castle   = 'castle'
+    curse    = 'curse'
+    duration = 'duration'
+    event    = 'event'
+    gathering = 'gathering'
+    knight   = 'knight'
+    landmark = 'landmark'
+    looter   = 'looter'
+    prize    = 'prize'
+    reaction = 'reaction'
+    reserve  = 'reserve'
+    ruins    = 'ruins'
+    shelter  = 'shelter'
+    traveller = 'traveller'
+    treasure = 'treasure'
+    victory  = 'victory'

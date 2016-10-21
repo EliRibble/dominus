@@ -1,9 +1,11 @@
 import collections
 import datetime
 import logging
+import uuid
 
 import chryso.connection
 import sqlalchemy
+import werkzeug.security
 
 import dominus.tables
 
@@ -24,7 +26,7 @@ Kingdom = collections.namedtuple('Kingdom', ('name', 'creator', 'cards', 'uuid')
 
 def create_card(set_, name, cardtypes, cost_in_treasure, cost_in_debt, is_in_supply):
     engine = chryso.connection.get()
-    query = dominus.tables.Card.insert().values(
+    query = dominus.tables.Card.insert().values( # pylint: disable=no-value-for-parameter
         cost_in_debt        = cost_in_debt,
         cost_in_treasure    = cost_in_treasure,
         is_in_supply        = is_in_supply,
@@ -33,9 +35,9 @@ def create_card(set_, name, cardtypes, cost_in_treasure, cost_in_debt, is_in_sup
         text                = '',
     )
     results = engine.execute(query)
-    uuid = results.inserted_primary_key[0]
-    query = dominus.tables.CardType.insert().values([dict(
-        card=uuid,
+    _uuid = results.inserted_primary_key[0]
+    query = dominus.tables.CardType.insert().values([dict( # pylint: disable=no-value-for-parameter
+        card=_uuid,
         name=cardtype,
     ) for cardtype in cardtypes])
     engine.execute(query)
@@ -46,19 +48,19 @@ def create_kingdom(name, creator, cards):
     with engine.atomic():
         all_cards = get_cards()
         cards_by_name = {card.name: card for card in all_cards}
-        query = dominus.tables.Kingdom.insert().values(name=name, creator=creator)
-        uuid = engine.execute(query).inserted_primary_key[0]
-        LOGGER.debug("Created kingdom %s (%s) by %s", name, uuid, creator)
-        query = dominus.tables.KingdomCard.insert().values([{
+        query = dominus.tables.Kingdom.insert().values(name=name, creator=creator) # pylint: disable=no-value-for-parameter
+        _uuid = engine.execute(query).inserted_primary_key[0]
+        LOGGER.debug("Created kingdom %s (%s) by %s", name, _uuid, creator)
+        query = dominus.tables.KingdomCard.insert().values([{ # pylint: disable=no-value-for-parameter
             'card'      : cards_by_name[card].uuid,
-            'kingdom'   : uuid,
+            'kingdom'   : _uuid,
         } for card in cards])
         engine.execute(query)
-        LOGGER.debug("Added cards %s to kingdom %s", cards, uuid)
+        LOGGER.debug("Added cards %s to kingdom %s", cards, _uuid)
 
 def create_set(name):
     engine = chryso.connection.get()
-    query = dominus.tables.Set.insert().values(name=name)
+    query = dominus.tables.Set.insert().values(name=name) # pylint: disable=no-value-for-parameter
     engine.execute(query)
     LOGGER.debug("Created set %s", name)
 
@@ -109,7 +111,7 @@ def get_kingdoms():
         card_uuid = row[dominus.tables.KingdomCard.c.card]
         card = cards_by_uuid[card_uuid]
         cards_by_kingdom_uuid[kingdom].append(card)
-    query = sqlalchemy.select([dominus.tables.Kingdom]).where(dominus.tables.Kingdom.c.deleted == None)
+    query = sqlalchemy.select([dominus.tables.Kingdom]).where(dominus.tables.Kingdom.c.deleted == None) # pylint: disable=singleton-comparison
     rows = engine.execute(query).fetchall()
     kingdoms = [Kingdom(
         cards   = cards_by_kingdom_uuid[row[dominus.tables.Kingdom.c.uuid]],
@@ -119,8 +121,42 @@ def get_kingdoms():
     ) for row in rows]
     return kingdoms
 
-def delete_kingdom(uuid):
+def delete_kingdom(_uuid):
     engine = chryso.connection.get()
-    query = dominus.tables.Kingdom.update().values(deleted=datetime.datetime.utcnow()).where(dominus.tables.Kingdom.c.uuid == uuid)
+    query = dominus.tables.Kingdom.update().values(deleted=datetime.datetime.utcnow()).where(dominus.tables.Kingdom.c.uuid == _uuid) # pylint: disable=no-value-for-parameter
     engine.execute(query)
-    LOGGER.debug("Deleted kingdom %s", uuid)
+    LOGGER.debug("Deleted kingdom %s", _uuid)
+
+def create_user(username, password):
+    engine = chryso.connection.get()
+
+    _uuid = uuid.uuid4()
+    statement = dominus.tables.User.insert().values( #pylint: disable=no-value-for-parameter
+        password_hash   = werkzeug.security.generate_password_hash(password),
+        username        = username,
+        uuid            = _uuid,
+    )
+    engine.execute(statement)
+
+    return _uuid
+
+def user_by_credentials(username, password):
+    engine = chryso.connection.get()
+
+    query = dominus.tables.User.select().where(dominus.tables.User.c.username == username)
+    result = engine.execute(query).first()
+    if not result:
+        return None
+
+    password_hash = result[dominus.tables.User.c.password_hash]
+    if not werkzeug.security.check_password_hash(password_hash, password):
+        return None
+
+    return dict(result)
+
+def user_by_uuid(_uuid):
+    engine = chryso.connection.get()
+
+    query = dominus.tables.User.select().where(dominus.tables.User.c.uuid == _uuid)
+    result = engine.execute(query).first()
+    return dict(result) if result else None
