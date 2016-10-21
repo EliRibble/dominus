@@ -1,5 +1,4 @@
 import chryso.schema
-import flask_user
 import sqlalchemy
 import sqlalchemy.dialects.postgresql
 
@@ -33,7 +32,7 @@ CardType = chryso.schema.table('cardtype',
 
 Kingdom = chryso.schema.table('kingdom',
     sqlalchemy.Column('name', sqlalchemy.String(256), nullable=False),
-    sqlalchemy.Column('creator', sqlalchemy.String(256), nullable=False),
+    sqlalchemy.Column('creator', None, sqlalchemy.ForeignKey('user.uuid'), nullable=False),
 )
 
 KingdomCard = chryso.schema.table('kingdomcard',
