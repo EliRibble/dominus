@@ -53,15 +53,14 @@ def kingdoms():
     _kingdoms = dominus.platform.get_kingdoms()
     return flask.render_template('kingdoms.html', kingdoms=_kingdoms)
 
-@blueprint.route('/kingdom/add/', methods=['GET'])
+@blueprint.route('/kingdoms/add/', methods=['GET'])
 def add_kingdom_get():
     cards = dominus.platform.get_cards()
     return flask.render_template('add_kingdom.html', cards=cards)
 
-@blueprint.route('/kingdom/add/', methods=['POST'])
+@blueprint.route('/kingdoms/add/', methods=['POST'])
 @parse({
     'name'      : str,
-    'creator'   : str,
 })
 def add_kingdom_post(arguments):
     LOGGER.debug("Got POST %s", arguments)
@@ -71,7 +70,7 @@ def add_kingdom_post(arguments):
             continue
         cards.append(value)
     cards = [card for card in cards if card]
-    dominus.platform.create_kingdom(arguments['name'], arguments['creator'], cards)
+    dominus.platform.create_kingdom(arguments['name'], flask.session['user_id'], cards)
     return flask.redirect('/kingdoms/')
 
 @blueprint.route('/kingdom/delete/', methods=['POST'])
