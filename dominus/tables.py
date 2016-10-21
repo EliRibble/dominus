@@ -1,10 +1,16 @@
 import chryso.schema
+import flask_user
 import sqlalchemy
 import sqlalchemy.dialects.postgresql
 
 import dominus.constants
 
 metadata = chryso.schema.metadata
+
+User = chryso.schema.table('user',
+    sqlalchemy.Column('username',      sqlalchemy.String(255), nullable=False, unique=True),
+    sqlalchemy.Column('password_hash', sqlalchemy.String(128), nullable=False),
+)
 
 Set = chryso.schema.table('set',
     sqlalchemy.Column('name', sqlalchemy.String(256), nullable=False),
@@ -37,7 +43,7 @@ KingdomCard = chryso.schema.table('kingdomcard',
 
 KingdomComment = chryso.schema.table('kingdomcomment',
     sqlalchemy.Column('kingdom', None, sqlalchemy.ForeignKey('kingdom.uuid'), nullable=False),
-    sqlalchemy.Column('author', sqlalchemy.String(256), nullable=False),
+    sqlalchemy.Column('content', sqlalchemy.String(2048), nullable=False),
 )
 
 KingdomRating = chryso.schema.table('kingdomrating',
@@ -48,4 +54,5 @@ KingdomRating = chryso.schema.table('kingdomrating',
 KingdomPlay = chryso.schema.table('kingdomplay',
     sqlalchemy.Column('kingdom', None, sqlalchemy.ForeignKey('kingdom.uuid'), nullable=False),
     sqlalchemy.Column('player_count', sqlalchemy.Integer(), nullable=False),
+    sqlalchemy.Column('rating', sqlalchemy.Integer(), nullable=False),
 )
