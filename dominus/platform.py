@@ -111,11 +111,17 @@ def get_kingdoms():
         card_uuid = row[dominus.tables.KingdomCard.c.card]
         card = cards_by_uuid[card_uuid]
         cards_by_kingdom_uuid[kingdom].append(card)
-    query = sqlalchemy.select([dominus.tables.Kingdom]).where(dominus.tables.Kingdom.c.deleted == None) # pylint: disable=singleton-comparison
+    query = (sqlalchemy.select([
+        dominus.tables.Kingdom.c.name,
+        dominus.tables.Kingdom.c.uuid,
+        dominus.tables.User.c.username,
+    ]).select_from(
+        dominus.tables.Kingdom.join(dominus.tables.User)
+    ).where(dominus.tables.Kingdom.c.deleted == None)) # pylint: disable=singleton-comparison
     rows = engine.execute(query).fetchall()
     kingdoms = [Kingdom(
         cards   = cards_by_kingdom_uuid[row[dominus.tables.Kingdom.c.uuid]],
-        creator = row[dominus.tables.Kingdom.c.creator],
+        creator = row[dominus.tables.User.c.username],
         name    = row[dominus.tables.Kingdom.c.name],
         uuid    = row[dominus.tables.Kingdom.c.uuid],
     ) for row in rows]
