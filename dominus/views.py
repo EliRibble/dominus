@@ -2,7 +2,6 @@ import collections
 import functools
 import json
 import logging
-import uuid
 
 import flask
 
@@ -15,7 +14,7 @@ blueprint = flask.Blueprint('views', __name__)
 def parse(args):
     def _decorate(request_handler):
         @functools.wraps(request_handler)
-        def _parse():
+        def _parse(**kwargs):
             values = {}
             missing_parameters = []
             for key, converter in args.items():
@@ -29,7 +28,8 @@ def parse(args):
                     'title' : "Missing required paramter '{}'".format(parameter),
                     'code'  : "missing-required-paramter",
                 } for parameter in missing_parameters]}), 400, {})
-            return request_handler(values)
+            kwargs['arguments'] = values
+            return request_handler(**kwargs)
         return _parse
     return _decorate
 
@@ -50,7 +50,7 @@ def admin():
 
 @blueprint.route('/kingdoms/', methods=['GET'])
 def kingdoms():
-    _kingdoms = dominus.platform.get_kingdoms()
+    _kingdoms = dominus.platform.get_kingdoms(flask.session['user_id'])
     return flask.render_template('kingdoms.html', kingdoms=_kingdoms)
 
 @blueprint.route('/kingdoms/add/', methods=['GET'])
@@ -73,13 +73,18 @@ def add_kingdom_post(arguments):
     dominus.platform.create_kingdom(arguments['name'], flask.session['user_id'], cards)
     return flask.redirect('/kingdoms/')
 
-@blueprint.route('/kingdom/delete/', methods=['POST'])
-@parse({'uuid' : uuid.UUID})
-def kingdom_delete(arguments):
-    dominus.platform.delete_kingdom(arguments['uuid'])
+@blueprint.route('/kingdom/<uuid:kingdom_id>/delete/', methods=['POST'])
+def kingdom_delete(kingdom_id):
+    dominus.platform.delete_kingdom(kingdom_id)
     return flask.redirect('/kingdoms/')
 
 @blueprint.route('/kingdom/<uuid:kingdom_id>/', methods=['GET'])
 def kingdom_get(kingdom_id):
-    kingdom = dominus.platform.get_kingdoms([kingdom_id])[0]
+    kingdom = dominus.platform.get_kingdoms(flask.session['user_id'], [kingdom_id])[0]
     return flask.render_template('kingdom.html', kingdom=kingdom)
+
+@blueprint.route('/kingdom/<uuid:kingdom_id>/rating/', methods=['POST'])
+@parse({'rating': int})
+def kingdom_rating_post(kingdom_id, arguments):
+    dominus.platform.create_kingdom_rating(flask.session['user_id'], kingdom_id, arguments['rating'])
+    return flask.redirect('/kingdom/{}/'.format(kingdom_id))

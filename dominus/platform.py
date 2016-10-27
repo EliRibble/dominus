@@ -24,11 +24,13 @@ Card = collections.namedtuple('Card', (
 ))
 class Kingdom():
     def __init__(self, name, created, creator, cards, _uuid):
-        self.cards   = cards
-        self.created = created
-        self.creator = creator
-        self.name    = name
-        self.uuid    = _uuid
+        self.cards          = cards
+        self.created        = created
+        self.creator        = creator
+        self.name           = name
+        self.rating_average = None
+        self.rating_mine    = None
+        self.uuid           = _uuid
 
     @property
     def sets(self):
@@ -86,6 +88,27 @@ def create_kingdom(name, creator, cards):
         } for card in cards])
         engine.execute(query)
         LOGGER.debug("Added cards %s to kingdom %s", cards, _uuid)
+        return _uuid
+
+def create_kingdom_rating(user, kingdom_uuid, rating):
+    engine = chryso.connection.get()
+    try:
+        with engine.atomic():
+            query = dominus.tables.KingdomRating.insert().values( # pylint: disable=no-value-for-parameter
+                creator = user,
+                kingdom = kingdom_uuid,
+                rating  = rating,
+            )
+            _uuid = engine.execute(query).inserted_primary_key[0]
+            LOGGER.debug("Created a rating on %s of %s for user %s", kingdom_uuid, rating, user)
+            return _uuid
+    except chryso.errors.DuplicateKeyError:
+        query = (dominus.tables.KingdomRating.update().values(rating=rating) # pylint: disable=no-value-for-parameter
+            .where(dominus.tables.KingdomRating.c.creator == user)
+            .where(dominus.tables.KingdomRating.c.kingdom == kingdom_uuid)
+        )
+        engine.execute(query)
+        LOGGER.debug("Updated rating on %s of %s for user %s", kingdom_uuid, rating, user)
 
 def create_set(name):
     engine = chryso.connection.get()
@@ -138,7 +161,7 @@ def _add_cards_to_kingdoms(kingdoms):
     engine = chryso.connection.get()
     kingdom_by_uuid = {kingdom.uuid: kingdom for kingdom in kingdoms}
     query = (sqlalchemy.select([dominus.tables.KingdomCard])
-        .where(dominus.tables.Kingdom.c.uuid.in_(kingdom_by_uuid.keys())))
+        .where(dominus.tables.KingdomCard.c.kingdom.in_(kingdom_by_uuid.keys())))
     rows = engine.execute(query).fetchall()
     card_uuids = {row[dominus.tables.KingdomCard.c.card] for row in rows}
     cards = get_cards(card_uuids)
@@ -150,7 +173,21 @@ def _add_cards_to_kingdoms(kingdoms):
         card = cards_by_uuid[card_uuid]
         kingdom.cards.append(card)
 
-def get_kingdoms(kingdom_uuids=None):
+def _add_ratings_to_kingdoms(user, kingdoms):
+    engine = chryso.connection.get()
+    kingdom_by_uuid = {kingdom.uuid: kingdom for kingdom in kingdoms}
+    query = (sqlalchemy.select([dominus.tables.KingdomRating])
+        .where(dominus.tables.KingdomRating.c.kingdom.in_(kingdom_by_uuid.keys()))
+        .where(dominus.tables.KingdomRating.c.creator == user)
+    )
+
+    rows = engine.execute(query).fetchall()
+    for row in rows:
+        kingdom = row[dominus.tables.KingdomRating.c.kingdom]
+        rating = row[dominus.tables.KingdomRating.c.rating]
+        kingdom_by_uuid[kingdom].rating_mine = rating
+
+def get_kingdoms(user, kingdom_uuids=None):
     engine = chryso.connection.get()
 
     query = (sqlalchemy.select([
@@ -172,6 +209,7 @@ def get_kingdoms(kingdom_uuids=None):
         _uuid   = row[dominus.tables.Kingdom.c.uuid],
     ) for row in rows]
     _add_cards_to_kingdoms(kingdoms)
+    _add_ratings_to_kingdoms(user, kingdoms)
     return kingdoms
 
 def delete_kingdom(_uuid):

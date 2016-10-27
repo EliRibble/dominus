@@ -9,6 +9,7 @@
   <li>Created: {{ kingdom.created.strftime("%A %d %B %Y") }}</li>
   <li>Sets: {% for set in kingdom.sets %}{{ set }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
   <li>Card Types: {% for card_type in kingdom.card_types() %}{{ card_type }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+  <li>My Rating: {{ kingdom.rating_mine }}</li>
 </ul>
 <h2>Cost histogram</h2>
 <table>
@@ -20,4 +21,8 @@
   </tr>
   {% endfor %}
 </table>
+<form method="POST" action="/kingdom/{{ kingdom.uuid }}/rating/">
+  <input type="number" name="rating" min="1" max="5" value="3"></input>
+  <input type="submit" value="Rate"></input>
+</form>
 {% endblock %}
