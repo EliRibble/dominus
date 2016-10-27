@@ -10,6 +10,7 @@
   <ul>
     <li>Creator: {{ kingdom.creator }}</li>
     <li>Sets: {% for set in kingdom.sets %}{{ set }}{% if not loop.last %},{% endif %}{% endfor %}</li>
+    <li>Card Types: {% for card_type in kingdom.card_types() %}{{ card_type }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
   </ul>
   <form action="/kingdom/delete/" method="POST">
     <input type="hidden" name="uuid" value="{{ kingdom.uuid }}"/>
