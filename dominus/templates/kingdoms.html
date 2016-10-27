@@ -7,11 +7,9 @@
 {% for kingdom in kingdoms %}
 <div class="kingdom">
   <h2>{{ kingdom.name }}</h2>
-  <h3>Creator: {{ kingdom.creator }}</h3>
   <ul>
-    {% for card in kingdom.cards %}
-      <li style="display: inline-block"><img src="/static/cards/{{card.name}}.jpg" width="150"/></li>
-    {% endfor %}
+    <li>Creator: {{ kingdom.creator }}</li>
+    <li>Sets: {% for set in kingdom.sets %}{{ set }}{% if not loop.last %},{% endif %}{% endfor %}</li>
   </ul>
   <form action="/kingdom/delete/" method="POST">
     <input type="hidden" name="uuid" value="{{ kingdom.uuid }}"/>

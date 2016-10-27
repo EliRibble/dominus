@@ -22,7 +22,13 @@ Card = collections.namedtuple('Card', (
     'text',
     'uuid',
 ))
-Kingdom = collections.namedtuple('Kingdom', ('name', 'creator', 'cards', 'uuid'))
+class Kingdom(): # pylint: disable=too-few-public-methods
+    def __init__(self, name, creator, cards, _uuid):
+        self.cards   = cards
+        self.creator = creator
+        self.name    = name
+        self.sets    = {card.set for card in self.cards}
+        self.uuid    = _uuid
 
 def create_card(set_, name, cardtypes, cost_in_treasure, cost_in_debt, is_in_supply):
     engine = chryso.connection.get()
@@ -84,7 +90,12 @@ def get_cards():
     for row in rows:
         types_by_uuid[row[dominus.tables.CardType.c.card]].append(row[dominus.tables.CardType.c.name])
 
-    query = sqlalchemy.select([dominus.tables.Card])
+    query = sqlalchemy.select([
+        dominus.tables.Card,
+        dominus.tables.Set.c.name,
+    ], use_labels=True).select_from(
+        dominus.tables.Card.join(dominus.tables.Set)
+    )
 
     rows = engine.execute(query).fetchall()
     return [Card(
@@ -92,7 +103,7 @@ def get_cards():
         cost_in_treasure = row[dominus.tables.Card.c.cost_in_treasure],
         is_in_supply     = row[dominus.tables.Card.c.is_in_supply],
         name             = row[dominus.tables.Card.c.name],
-        set              = row[dominus.tables.Card.c.set],
+        set              = row[dominus.tables.Set.c.name],
         text             = row[dominus.tables.Card.c.text],
         types            = set(types_by_uuid[row[dominus.tables.Card.c.uuid]]),
         uuid             = row[dominus.tables.Card.c.uuid],
@@ -123,7 +134,7 @@ def get_kingdoms():
         cards   = cards_by_kingdom_uuid[row[dominus.tables.Kingdom.c.uuid]],
         creator = row[dominus.tables.User.c.username],
         name    = row[dominus.tables.Kingdom.c.name],
-        uuid    = row[dominus.tables.Kingdom.c.uuid],
+        _uuid   = row[dominus.tables.Kingdom.c.uuid],
     ) for row in rows]
     return kingdoms
 
