@@ -27,8 +27,11 @@ class Kingdom(): # pylint: disable=too-few-public-methods
         self.cards   = cards
         self.creator = creator
         self.name    = name
-        self.sets    = {card.set for card in self.cards}
         self.uuid    = _uuid
+
+    @property
+    def sets(self):
+        return {card.set for card in self.cards}
 
 def create_card(set_, name, cardtypes, cost_in_treasure, cost_in_debt, is_in_supply):
     engine = chryso.connection.get()
@@ -81,7 +84,7 @@ def get_sets():
         uuid=row[dominus.tables.Set.c.uuid],
     ) for row in rows]
 
-def get_cards():
+def get_cards(card_uuids=None):
     engine = chryso.connection.get()
 
     query = sqlalchemy.select([dominus.tables.CardType])
@@ -96,6 +99,8 @@ def get_cards():
     ], use_labels=True).select_from(
         dominus.tables.Card.join(dominus.tables.Set)
     )
+    if card_uuids:
+        query = query.where(dominus.tables.Card.c.uuid.in_(card_uuids))
 
     rows = engine.execute(query).fetchall()
     return [Card(
@@ -109,19 +114,25 @@ def get_cards():
         uuid             = row[dominus.tables.Card.c.uuid],
     ) for row in rows]
 
-def get_kingdoms():
+def _add_cards_to_kingdoms(kingdoms):
+    engine = chryso.connection.get()
+    kingdom_by_uuid = {kingdom.uuid: kingdom for kingdom in kingdoms}
+    query = (sqlalchemy.select([dominus.tables.KingdomCard])
+        .where(dominus.tables.Kingdom.c.uuid.in_(kingdom_by_uuid.keys())))
+    rows = engine.execute(query).fetchall()
+    card_uuids = {row[dominus.tables.KingdomCard.c.card] for row in rows}
+    cards = get_cards(card_uuids)
+    cards_by_uuid = {card.uuid: card for card in cards}
+    for row in rows:
+        kingdom_uuid = row[dominus.tables.KingdomCard.c.kingdom]
+        card_uuid = row[dominus.tables.KingdomCard.c.card]
+        kingdom = kingdom_by_uuid[kingdom_uuid]
+        card = cards_by_uuid[card_uuid]
+        kingdom.cards.append(card)
+
+def get_kingdoms(kingdom_uuids=None):
     engine = chryso.connection.get()
 
-    cards = get_cards()
-    cards_by_uuid = {card.uuid: card for card in cards}
-    query = sqlalchemy.select([dominus.tables.KingdomCard])
-    rows = engine.execute(query).fetchall()
-    cards_by_kingdom_uuid = collections.defaultdict(list)
-    for row in rows:
-        kingdom = row[dominus.tables.KingdomCard.c.kingdom]
-        card_uuid = row[dominus.tables.KingdomCard.c.card]
-        card = cards_by_uuid[card_uuid]
-        cards_by_kingdom_uuid[kingdom].append(card)
     query = (sqlalchemy.select([
         dominus.tables.Kingdom.c.name,
         dominus.tables.Kingdom.c.uuid,
@@ -129,13 +140,16 @@ def get_kingdoms():
     ]).select_from(
         dominus.tables.Kingdom.join(dominus.tables.User)
     ).where(dominus.tables.Kingdom.c.deleted == None)) # pylint: disable=singleton-comparison
+    if kingdom_uuids:
+        query = query.where(dominus.tables.Kingdom.c.uuid.in_(kingdom_uuids))
     rows = engine.execute(query).fetchall()
     kingdoms = [Kingdom(
-        cards   = cards_by_kingdom_uuid[row[dominus.tables.Kingdom.c.uuid]],
+        cards   = [],
         creator = row[dominus.tables.User.c.username],
         name    = row[dominus.tables.Kingdom.c.name],
         _uuid   = row[dominus.tables.Kingdom.c.uuid],
     ) for row in rows]
+    _add_cards_to_kingdoms(kingdoms)
     return kingdoms
 
 def delete_kingdom(_uuid):

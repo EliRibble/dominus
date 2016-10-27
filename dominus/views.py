@@ -78,3 +78,8 @@ def add_kingdom_post(arguments):
 def kingdom_delete(arguments):
     dominus.platform.delete_kingdom(arguments['uuid'])
     return flask.redirect('/kingdoms/')
+
+@blueprint.route('/kingdom/<uuid:kingdom_id>/', methods=['GET'])
+def kingdom_get(kingdom_id):
+    kingdom = dominus.platform.get_kingdoms([kingdom_id])[0]
+    return flask.render_template('kingdom.html', kingdom=kingdom)

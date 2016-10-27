@@ -6,7 +6,7 @@
 <h1>Kingdoms</h1>
 {% for kingdom in kingdoms %}
 <div class="kingdom">
-  <h2>{{ kingdom.name }}</h2>
+  <h2><a href="/kingdom/{{ kingdom.uuid }}/">{{ kingdom.name }}</a></h2>
   <ul>
     <li>Creator: {{ kingdom.creator }}</li>
     <li>Sets: {% for set in kingdom.sets %}{{ set }}{% if not loop.last %},{% endif %}{% endfor %}</li>

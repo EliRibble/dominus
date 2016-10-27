@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% block javascript %}
+{% endblock %}
+
+{% block main_content %}
+<h1>{{ kingdom.name }}</h1>
+<ul>
+  <li>Creator: {{ kingdom.creator }}</li>
+  <li>Sets: {% for set in kingdom.sets %}{{ set }}{% if not loop.last %},{% endif %}{% endfor %}</li>
+</ul>
+{% endblock %}
