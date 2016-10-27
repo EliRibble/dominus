@@ -49,6 +49,7 @@ KingdomRating = chryso.schema.table('kingdomrating',
     sqlalchemy.Column('kingdom', None, sqlalchemy.ForeignKey('kingdom.uuid'), nullable=False),
     sqlalchemy.Column('rating', sqlalchemy.Integer(), nullable=False),
     sqlalchemy.Column('creator', None, sqlalchemy.ForeignKey('user.uuid'), nullable=False),
+    sqlalchemy.UniqueConstraint('kingdom', 'creator', name='uq_rating_kingdom_creator'),
 )
 
 KingdomPlay = chryso.schema.table('kingdomplay',
