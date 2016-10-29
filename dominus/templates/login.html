@@ -1,20 +1,17 @@
-<html>
-<h1>Dominus Login</h1>
+{% extends 'layout.html' %}
+{% block main_content %}
 <form method="POST" action="/login/">
   <div class="row">
-    <div class="six columns">
-      <label for="username">Username</label>
-      <input id="username" type="text" name="username" placeholder="LeeroyJenkins"></input>
-    </div>
-
-    <div class="six columns">
-      <label for="password">Password</label>
-      <input id="password" type="password" name="password" placeholder="secrets"></input>
-    </div>
+    <label for="username">Username</label>
+    <input id="username" type="text" name="username" placeholder="LeeroyJenkins"></input>
+  </div>
+  <div class="row">
+    <label for="password">Password</label>
+    <input id="password" type="password" name="password" placeholder="secrets"></input>
   </div>
   <div class="row">
     <input type="submit" value="Login"></input>
   </div>
 </form>
 <a href="/register/">Or register instead</a>
-</html>
+{% endblock %}
