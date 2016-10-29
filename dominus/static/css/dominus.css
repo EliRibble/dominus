@@ -35,7 +35,9 @@ body {
   color: #444;
   cursor: default;
 }
- 
+.nav input {
+  color: white;
+}
 @media screen and (min-width: 600px) {
   .nav li {
     width: 200px;

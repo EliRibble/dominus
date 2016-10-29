@@ -4,6 +4,11 @@
       <li class="home"><a href="/"><img src="/static/img/dominus.png" width="200"></img></a></li>
       <li class="tutorials"><a href="/kingdoms/">All</a></li>
       <li class="news"><a href="/kingdoms/add">Add</a></li>
+      <li>
+        <form action="/login/" method="DELETE">
+          <input type="submit" value="Logout {{ current_user.username }}"/>
+        </form>
+      </li>
     </ul>
   </div>
 </header>
