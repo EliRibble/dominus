@@ -4,14 +4,18 @@
 
 {% block main_content %}
 <h1>{{ kingdom.name }}</h1>
-<ul>
+<ul class="kingdom-summary">
   <li>Creator: {{ kingdom.creator }}</li>
   <li>Created: {{ kingdom.created.strftime("%A %d %B %Y") }}</li>
   <li>Sets: {% for set in kingdom.sets %}{{ set }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-  <li>Card Types: {% for card_type in kingdom.card_types() %}{{ card_type }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+  <li>Card Types:
+    {% for card_type in kingdom.card_types() %}
+      <span class="card-type {{ card_type }}">{{ card_type }}</span>{% if not loop.last %}, {% endif %}
+    {% endfor %}
+  </li>
   <li>My Rating: {{ kingdom.rating_mine }}</li>
 </ul>
-<h2>Cost histogram</h2>
+<h2>Cards</h2>
 <table>
   {% for cost, cards in kingdom.cards_by_cost_in_treasure().items() %}
   <tr>
