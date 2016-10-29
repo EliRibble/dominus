@@ -1,13 +1,4 @@
 {% extends 'layout.html' %}
-{% block javascript %}
-<script type="application/javascript">
-  function onSelectCard(e) {
-    var img = document.getElementById(e.target.id + 'img');
-    img.src = '/static/cards/' + e.target.value + '.jpg';
-  }
-  console.log('loaded');
-</script>
-{% endblock %}
 
 {% block main_content %}
 <h1>Add Kingdom</h1>

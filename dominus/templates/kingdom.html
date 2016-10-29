@@ -13,7 +13,16 @@
       <span class="card-type {{ card_type }}">{{ card_type }}</span>{% if not loop.last %}, {% endif %}
     {% endfor %}
   </li>
-  <li>My Rating: {{ kingdom.rating_mine }}</li>
+  <li>My Rating:
+    <span class="star-rating">
+      <input type="radio" name="rating" value="1" {% if kingdom.rating_mine == 1 %}checked="checked"{% endif %}><i></i>
+      <input type="radio" name="rating" value="2" {% if kingdom.rating_mine == 2 %}checked="checked"{% endif %}><i></i>
+      <input type="radio" name="rating" value="3" {% if kingdom.rating_mine == 3 %}checked="checked"{% endif %}><i></i>
+      <input type="radio" name="rating" value="4" {% if kingdom.rating_mine == 4 %}checked="checked"{% endif %}><i></i>
+      <input type="radio" name="rating" value="5" {% if kingdom.rating_mine == 5 %}checked="checked"{% endif %}><i></i>
+    </span>
+  </li>
+  <li>{{ kingdom.rating_mine }}</li>
 </ul>
 <h2>Cards</h2>
 <table>
@@ -25,8 +34,8 @@
   </tr>
   {% endfor %}
 </table>
-<form method="POST" action="/kingdom/{{ kingdom.uuid }}/rating/">
-  <input type="number" name="rating" min="1" max="5" value="3"></input>
+<form id="rating-form" method="POST" action="/kingdom/{{ kingdom.uuid }}/rating/">
+  <input type="hidden" name="rating" min="1" max="5" value="0"></input>
   <input type="submit" value="Rate"></input>
 </form>
 {% endblock %}
