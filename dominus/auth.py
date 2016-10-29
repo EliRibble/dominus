@@ -47,7 +47,8 @@ def do_register():
         dominus.platform.create_user(username, password)
     except chryso.errors.DuplicateKeyError:
         return flask.redirect('/register/?error=already-exists')
-    user = dominus.platform.user_by_credentials(username, password)
+    record = dominus.platform.user_by_credentials(username, password)
+    user = User(record['username'], record['uuid'])
     flask_login.login_user(user)
     return flask.redirect('/')
 
