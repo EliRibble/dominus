@@ -82,6 +82,8 @@ def create_kingdom(name, creator, cards):
         query = dominus.tables.Kingdom.insert().values(name=name, creator=creator) # pylint: disable=no-value-for-parameter
         _uuid = engine.execute(query).inserted_primary_key[0]
         LOGGER.debug("Created kingdom %s (%s) by %s", name, _uuid, creator)
+        if not cards:
+            return _uuid
         query = dominus.tables.KingdomCard.insert().values([{ # pylint: disable=no-value-for-parameter
             'card'      : cards_by_name[card].uuid,
             'kingdom'   : _uuid,
@@ -174,8 +176,12 @@ def _add_cards_to_kingdoms(kingdoms):
         kingdom.cards.append(card)
 
 def _add_ratings_to_kingdoms(user, kingdoms):
-    engine = chryso.connection.get()
     kingdom_by_uuid = {kingdom.uuid: kingdom for kingdom in kingdoms}
+    _add_my_ratings_to_kingdoms(user, kingdom_by_uuid)
+    _add_average_ratings_to_kingdoms(kingdom_by_uuid)
+
+def _add_my_ratings_to_kingdoms(user, kingdom_by_uuid):
+    engine = chryso.connection.get()
     query = (sqlalchemy.select([dominus.tables.KingdomRating])
         .where(dominus.tables.KingdomRating.c.kingdom.in_(kingdom_by_uuid.keys()))
         .where(dominus.tables.KingdomRating.c.creator == user)
@@ -186,6 +192,18 @@ def _add_ratings_to_kingdoms(user, kingdoms):
         kingdom = row[dominus.tables.KingdomRating.c.kingdom]
         rating = row[dominus.tables.KingdomRating.c.rating]
         kingdom_by_uuid[kingdom].rating_mine = rating
+
+def _add_average_ratings_to_kingdoms(kingdom_by_uuid):
+    engine = chryso.connection.get()
+    average = sqlalchemy.func.avg(dominus.tables.KingdomRating.c.rating)
+    query = (sqlalchemy.select([
+        dominus.tables.KingdomRating.c.kingdom,
+        average,
+    ]).group_by(dominus.tables.KingdomRating.c.kingdom))
+    rows = engine.execute(query).fetchall()
+    for row in rows:
+        kingdom = kingdom_by_uuid[row[dominus.tables.KingdomRating.c.kingdom]]
+        kingdom.rating_average = row[average]
 
 def get_kingdoms(user, kingdom_uuids=None):
     engine = chryso.connection.get()

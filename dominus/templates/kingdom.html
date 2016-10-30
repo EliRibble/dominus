@@ -13,6 +13,7 @@
       <span class="card-type {{ card_type }}">{{ card_type }}</span>{% if not loop.last %}, {% endif %}
     {% endfor %}
   </li>
+  <li>Average Rating: {{ kingdom.rating_average }}</li>
   <li>My Rating:
     <span class="star-rating">
       <input type="radio" name="rating" value="1" {% if kingdom.rating_mine == 1 %}checked="checked"{% endif %}><i></i>
@@ -22,7 +23,6 @@
       <input type="radio" name="rating" value="5" {% if kingdom.rating_mine == 5 %}checked="checked"{% endif %}><i></i>
     </span>
   </li>
-  <li>{{ kingdom.rating_mine }}</li>
 </ul>
 <h2>Cards</h2>
 <table>

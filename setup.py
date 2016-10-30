@@ -112,6 +112,7 @@ def main():
                 'mothermayi-pylint>=0.5',
                 'mothermayi-isort>=0.8',
                 'pylint>=1.5.5',
+                'pytest>=3.0.3',
             ]
         },
         packages             = ["dominus"],
