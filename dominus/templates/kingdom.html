@@ -4,10 +4,14 @@
 <ul class="kingdom-summary">
   <li>Creator: {{ kingdom.creator }}</li>
   <li>Created: {{ kingdom.created.strftime("%A %d %B %Y") }}</li>
-  <li>Sets: {% for set in kingdom.sets %}{{ set }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+  <li>Sets:
+    {% for set in kingdom.sets %}
+      <span class="set {{ set }}">{{ set }}</span>
+    {% endfor %}
+  </li>
   <li>Card Types:
     {% for card_type in kingdom.card_types() %}
-      <span class="card-type {{ card_type }}">{{ card_type }}</span>{% if not loop.last %}, {% endif %}
+      <span class="card-type {{ card_type }}">{{ card_type }}</span>
     {% endfor %}
   </li>
   <li>Average Rating: {{ kingdom.rating_average }}</li>
