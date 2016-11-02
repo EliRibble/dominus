@@ -35,7 +35,17 @@
   </tr>
   {% endfor %}
 </table>
-<h2>Play Log</h2>
+<h2>Play Logs</h2>
+{% for play_log in kingdom.play_logs %}
+  <h3>Rating: {{ play_log.rating }}</h3> 
+  <h3>{{ play_log.created.strftime("%A %d %B %Y") }} - {{ play_log.player_count }} Players - {{ play_log.creator }}</h3>
+  {% if play_log.comments %}
+    <p>{{ play_log.comments }}</p>
+  {% else %}
+    <p><i>No comments</i></p>
+  {% endif %}
+{% endfor %}
+<h2>Log a play</h2>
 <p>If you've played this kingdom please tell us a bit about your experience for other players</p>
 <form id="play-form" method="POST" action="/kingdom/{{ kingdom.uuid }}/play-log/">
   <label for="player_count">Number of Players</label>

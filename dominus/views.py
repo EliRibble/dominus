@@ -83,6 +83,16 @@ def kingdom_get(kingdom_id):
     kingdom = dominus.platform.get_kingdoms(flask.session['user_id'], [kingdom_id])[0]
     return flask.render_template('kingdom.html', kingdom=kingdom)
 
+@blueprint.route('/kingdom/<uuid:kingdom_id>/play-log/', methods=['POST'])
+@parse({
+    'comments'      : str,
+    'player_count'  : int,
+    'rating'        : int,
+})
+def kingdom_play_log_post(kingdom_id, arguments):
+    dominus.platform.create_kingdom_play_log(flask.session['user_id'], kingdom_id, arguments)
+    return flask.redirect('/kingdom/{}/'.format(kingdom_id))
+
 @blueprint.route('/kingdom/<uuid:kingdom_id>/rating/', methods=['POST'])
 @parse({'rating': int})
 def kingdom_rating_post(kingdom_id, arguments):

@@ -22,12 +22,13 @@ Card = collections.namedtuple('Card', (
     'text',
     'uuid',
 ))
-class Kingdom():
+class Kingdom(): # pylint: disable=too-many-instance-attributes
     def __init__(self, name, created, creator, cards, _uuid):
         self.cards          = cards
         self.created        = created
         self.creator        = creator
         self.name           = name
+        self.play_logs      = None
         self.rating_average = None
         self.rating_mine    = None
         self.uuid           = _uuid
@@ -91,6 +92,19 @@ def create_kingdom(name, creator, cards):
         engine.execute(query)
         LOGGER.debug("Added cards %s to kingdom %s", cards, _uuid)
         return _uuid
+
+def create_kingdom_play_log(user, kingdom_uuid, arguments):
+    engine = chryso.connection.get()
+    query = dominus.tables.KingdomPlay.insert().values( # pylint: disable=no-value-for-parameter
+        creator         = user,
+        kingdom         = kingdom_uuid,
+        comments        = arguments['comments'],
+        rating          = arguments['rating'],
+        player_count    = arguments['player_count'],
+    )
+    _uuid = engine.execute(query).inserted_primary_key[0]
+    LOGGER.debug("Created a play log on %s of %s for user %s with uuid %s", kingdom_uuid, arguments, user, _uuid)
+    return _uuid
 
 def create_kingdom_rating(user, kingdom_uuid, rating):
     engine = chryso.connection.get()
@@ -159,9 +173,8 @@ def get_cards(card_uuids=None):
         uuid             = row[dominus.tables.Card.c.uuid],
     ) for row in rows]
 
-def _add_cards_to_kingdoms(kingdoms):
+def _add_cards_to_kingdoms(kingdom_by_uuid):
     engine = chryso.connection.get()
-    kingdom_by_uuid = {kingdom.uuid: kingdom for kingdom in kingdoms}
     query = (sqlalchemy.select([dominus.tables.KingdomCard])
         .where(dominus.tables.KingdomCard.c.kingdom.in_(kingdom_by_uuid.keys())))
     rows = engine.execute(query).fetchall()
@@ -175,8 +188,7 @@ def _add_cards_to_kingdoms(kingdoms):
         card = cards_by_uuid[card_uuid]
         kingdom.cards.append(card)
 
-def _add_ratings_to_kingdoms(user, kingdoms):
-    kingdom_by_uuid = {kingdom.uuid: kingdom for kingdom in kingdoms}
+def _add_ratings_to_kingdoms(user, kingdom_by_uuid):
     _add_my_ratings_to_kingdoms(user, kingdom_by_uuid)
     _add_average_ratings_to_kingdoms(kingdom_by_uuid)
 
@@ -205,7 +217,31 @@ def _add_average_ratings_to_kingdoms(kingdom_by_uuid):
         kingdom = kingdom_by_uuid[row[dominus.tables.KingdomRating.c.kingdom]]
         kingdom.rating_average = round(row[average], 2)
 
-def get_kingdoms(user, kingdom_uuids=None):
+def _add_play_logs_to_kingdoms(kingdom_by_uuid):
+    engine = chryso.connection.get()
+    query = (sqlalchemy.select([
+            dominus.tables.KingdomPlay,
+            dominus.tables.User.c.username,
+        ]).select_from(
+            dominus.tables.KingdomPlay.join(dominus.tables.User)
+        )
+        .where(dominus.tables.KingdomPlay.c.kingdom.in_(kingdom_by_uuid.keys()))
+        .order_by(dominus.tables.KingdomPlay.c.created)
+    )
+    rows = engine.execute(query).fetchall()
+    for kingdom in kingdom_by_uuid.values():
+        kingdom.play_logs = []
+    for row in rows:
+        kingdom = kingdom_by_uuid[row[dominus.tables.KingdomPlay.c.kingdom]]
+        kingdom.play_logs.append({
+            'comments'   : row[dominus.tables.KingdomPlay.c.comments],
+            'created'   : row[dominus.tables.KingdomPlay.c.created],
+            'creator'   : row[dominus.tables.User.c.username],
+            'player_count'   : row[dominus.tables.KingdomPlay.c.player_count],
+            'rating'   : row[dominus.tables.KingdomPlay.c.rating],
+        })
+
+def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True):
     engine = chryso.connection.get()
 
     query = (sqlalchemy.select([
@@ -226,8 +262,11 @@ def get_kingdoms(user, kingdom_uuids=None):
         name    = row[dominus.tables.Kingdom.c.name],
         _uuid   = row[dominus.tables.Kingdom.c.uuid],
     ) for row in rows]
-    _add_cards_to_kingdoms(kingdoms)
-    _add_ratings_to_kingdoms(user, kingdoms)
+    kingdom_by_uuid = {kingdom.uuid: kingdom for kingdom in kingdoms}
+    _add_cards_to_kingdoms(kingdom_by_uuid)
+    _add_ratings_to_kingdoms(user, kingdom_by_uuid)
+    if include_play_logs:
+        _add_play_logs_to_kingdoms(kingdom_by_uuid)
     return kingdoms
 
 def delete_kingdom(_uuid):
