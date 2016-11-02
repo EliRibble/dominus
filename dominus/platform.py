@@ -203,7 +203,7 @@ def _add_average_ratings_to_kingdoms(kingdom_by_uuid):
     rows = engine.execute(query).fetchall()
     for row in rows:
         kingdom = kingdom_by_uuid[row[dominus.tables.KingdomRating.c.kingdom]]
-        kingdom.rating_average = row[average]
+        kingdom.rating_average = round(row[average], 2)
 
 def get_kingdoms(user, kingdom_uuids=None):
     engine = chryso.connection.get()
