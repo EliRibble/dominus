@@ -7,12 +7,16 @@
 {% for kingdom in kingdoms %}
 <div class="kingdom">
   <h2><a href="/kingdom/{{ kingdom.uuid }}/">{{ kingdom.name }}</a></h2>
-  <ul>
+  <ul class="kingdom-summary">
     <li>Creator: {{ kingdom.creator }}</li>
-    <li>Sets: {% for set in kingdom.sets %}{{ set }}{% if not loop.last %},{% endif %}{% endfor %}</li>
-    <li>Card Types: 
+    <li>Sets:
+      {% for set in kingdom.sets %}
+        <span class="set {{ set }}">{{ set }}</span>
+      {% endfor %}
+    </li>
+    <li>Card Types:
       {% for card_type in kingdom.card_types() %}
-        <span class="card-type {{ card_type }}">{{ card_type }}</span>{% if not loop.last %}, {% endif %}
+        <span class="card-type {{ card_type }}">{{ card_type }}</span>
       {% endfor %}
     </li>
   </ul>
