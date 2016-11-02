@@ -18,18 +18,18 @@ body {
   height: 40px;
   border-bottom: 1px solid #888;
 }
- 
+
 .nav a {
   text-decoration: none;
   color: #fff;
   display: block;
   transition: .3s background-color;
 }
- 
+
 .nav a:hover {
   background-color: #005f5f;
 }
- 
+
 .nav a.active {
   background-color: #fff;
   color: #444;
@@ -52,6 +52,13 @@ body {
     margin-right: -4px;
   }
 
+}
+.nav li.home {
+  background-image: url("/static/img/dominus-logo.png");
+  background-repeat: no-repeat;
+}
+.nav li.home a {
+  margin-left: 20px;
 }
 ul.kingdom-summary {
 	list-style: circle;
