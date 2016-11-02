@@ -30,13 +30,26 @@
   {% for cost, cards in kingdom.cards_by_cost_in_treasure().items() %}
   <tr>
     {% for card in cards %}
-      <td><img src="/static/cards/{{card.name}}.jpg" width="100"></img></td>
+      <td><img src="/static/cards/{{card.name}}.jpg" width="200"></img></td>
     {% endfor %}
   </tr>
   {% endfor %}
 </table>
-<form id="rating-form" method="POST" action="/kingdom/{{ kingdom.uuid }}/rating/">
-  <input type="hidden" name="rating" min="1" max="5" value="0"></input>
-  <input type="submit" value="Rate"></input>
+<h2>Play Log</h2>
+<p>If you've played this kingdom please tell us a bit about your experience for other players</p>
+<form id="play-form" method="POST" action="/kingdom/{{ kingdom.uuid }}/play-log/">
+  <label for="player_count">Number of Players</label>
+  <input type="number" value="2" name="player_count" min="2" max="6"></input>
+  <label for="rating">My rating for this game</label>
+  <span class="star-rating">
+    <input type="radio" name="rating" value="1"><i></i>
+    <input type="radio" name="rating" value="2"><i></i>
+    <input type="radio" name="rating" value="3" checked="checked"><i></i>
+    <input type="radio" name="rating" value="4"><i></i>
+    <input type="radio" name="rating" value="5"><i></i>
+  </span>
+  <label for="comments">Comments on the game</label>
+  <textarea maxlength="2000" name="comments" placeholder="One one decent strategy, great for many players, too much trashing, etc" rows="8" cols="100"></textarea>
+  <input type="submit" value="I Played This!"></input>
 </form>
 {% endblock %}
