@@ -46,7 +46,7 @@ body {
     line-height: 50px;
     font-size: 1.4em;
   }
- 
+
   .nav li {
     display: inline-block;
     margin-right: -4px;
@@ -56,41 +56,41 @@ body {
 .nav li.home {
   background-image: url("/static/img/dominus-logo.png");
   background-repeat: no-repeat;
-}
-.nav li.home a {
-  margin-left: 20px;
+  a {
+  	margin-left: 20px;
+  }
 }
 ul.kingdom-summary {
 	list-style: circle;
 	margin-left: 20px;
-}
-ul.kingdom-summary li {
-	margin-bottom: 0
+	li {
+		margin-bottom: 0
+	}
 }
 span.card-type {
 	border: 1px solid;
 	border-radius: 10px;
 	padding: 3px;
 	border-color: #888;
-}
-span.card-type.action {
-	background-color: white;
-}
-span.card-type.attack {
-	background-color: red;
-}
-span.card-type.duration {
-	background-color: orange;
-}
-span.card-type.reaction {
-	background-color: blue;
-}
-span.card-type.reserve {
-	background-color: antiquewhite;
-}
-span.card-type.treasure {
-	background-color: yellow;
-}
-span.card-type.victory {
-	background-color: green;
+	&.action {
+		background-color: white;
+	}
+	&.attack {
+		background-color: red;
+	}
+	&.duration {
+		background-color: orange;
+	}
+	&.reaction {
+		background-color: blue;
+	}
+	&.reserve {
+		background-color: antiquewhite;
+	}
+	&.treasure {
+		background-color: yellow;
+	}
+	&.victory {
+		background-color: green;
+	}
 }
