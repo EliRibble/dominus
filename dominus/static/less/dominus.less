@@ -1,3 +1,13 @@
+@action: #e4e4d8;
+@attack: #aa2a27;
+@duration: #f58f09;
+@event: #c0c8bb;
+@landmark: #5dac6b;
+@reaction: #86b6cc;
+@reserve: #be9d50;
+@treasure: #f3c95d;
+@victory: #8fd068;
+
 body {
   margin: 0;
   padding: 0;
@@ -80,24 +90,30 @@ span.card-type {
 	padding: 3px;
 	border-color: #888;
 	&.action {
-		background-color: white;
+		background-color: @action;
 	}
 	&.attack {
-		background-color: red;
+		background-color: @attack;
 	}
 	&.duration {
-		background-color: orange;
+		background-color: @duration;
+	}
+	&.event {
+		background-color: @event;
+	}
+	&.landmark {
+		background-color: @landmark;
 	}
 	&.reaction {
-		background-color: blue;
+		background-color: @reaction;
 	}
 	&.reserve {
-		background-color: antiquewhite;
+		background-color: @reserve;
 	}
 	&.treasure {
-		background-color: yellow;
+		background-color: @treasure;
 	}
 	&.victory {
-		background-color: green;
+		background-color: @victory;
 	}
 }
