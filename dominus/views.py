@@ -75,7 +75,7 @@ def add_kingdom_post(arguments):
 
 @blueprint.route('/kingdom/<uuid:kingdom_id>/delete/', methods=['POST'])
 def kingdom_delete(kingdom_id):
-    dominus.platform.delete_kingdom(kingdom_id)
+    dominus.platform.delete_kingdom(flask.session['user_id'], kingdom_id)
     return flask.redirect('/kingdoms/')
 
 @blueprint.route('/kingdom/<uuid:kingdom_id>/', methods=['GET'])

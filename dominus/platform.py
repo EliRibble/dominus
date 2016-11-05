@@ -209,9 +209,11 @@ def _add_average_ratings_to_kingdoms(kingdom_by_uuid):
     engine = chryso.connection.get()
     average = sqlalchemy.func.avg(dominus.tables.KingdomRating.c.rating)
     query = (sqlalchemy.select([
-        dominus.tables.KingdomRating.c.kingdom,
-        average,
-    ]).group_by(dominus.tables.KingdomRating.c.kingdom))
+            dominus.tables.KingdomRating.c.kingdom,
+            average,
+        ]).group_by(dominus.tables.KingdomRating.c.kingdom)
+        .where(dominus.tables.KingdomRating.c.kingdom.in_(kingdom_by_uuid.keys()))
+    )
     rows = engine.execute(query).fetchall()
     for row in rows:
         kingdom = kingdom_by_uuid[row[dominus.tables.KingdomRating.c.kingdom]]
@@ -269,9 +271,13 @@ def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True):
         _add_play_logs_to_kingdoms(kingdom_by_uuid)
     return kingdoms
 
-def delete_kingdom(_uuid):
+def delete_kingdom(user, _uuid):
     engine = chryso.connection.get()
-    query = dominus.tables.Kingdom.update().values(deleted=datetime.datetime.utcnow()).where(dominus.tables.Kingdom.c.uuid == _uuid) # pylint: disable=no-value-for-parameter
+    query = (dominus.tables.Kingdom.update() # pylint: disable=no-value-for-parameter
+    .values(
+        deleted=datetime.datetime.utcnow()
+    ).where(dominus.tables.Kingdom.c.uuid == _uuid)
+    .where(dominus.tables.Kingdom.c.creator == user))
     engine.execute(query)
     LOGGER.debug("Deleted kingdom %s", _uuid)
 
