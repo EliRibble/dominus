@@ -31,7 +31,7 @@ CardType = chryso.schema.table('cardtype',
 )
 
 Kingdom = chryso.schema.table('kingdom',
-    sqlalchemy.Column('name', sqlalchemy.String(256), nullable=False),
+    sqlalchemy.Column('name', sqlalchemy.String(256), nullable=False, unique=True),
     sqlalchemy.Column('creator', None, sqlalchemy.ForeignKey('user.uuid'), nullable=False),
 )
 
