@@ -253,7 +253,8 @@ def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True):
         dominus.tables.User.c.username,
     ]).select_from(
         dominus.tables.Kingdom.join(dominus.tables.User)
-    ).where(dominus.tables.Kingdom.c.deleted == None)) # pylint: disable=singleton-comparison
+    ).where(dominus.tables.Kingdom.c.deleted == None) # pylint: disable=singleton-comparison
+    .order_by(dominus.tables.Kingdom.c.created.desc()))
     if kingdom_uuids:
         query = query.where(dominus.tables.Kingdom.c.uuid.in_(kingdom_uuids))
     rows = engine.execute(query).fetchall()
