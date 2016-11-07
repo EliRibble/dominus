@@ -35,6 +35,7 @@ Kingdom = chryso.schema.table('kingdom',
     sqlalchemy.Column('has_colony', sqlalchemy.Boolean(), server_default='FALSE', nullable=False),
     sqlalchemy.Column('has_platinum', sqlalchemy.Boolean(), server_default='FALSE', nullable=False),
     sqlalchemy.Column('has_shelters', sqlalchemy.Boolean(), server_default='FALSE', nullable=False),
+    sqlalchemy.Column('is_recommended', sqlalchemy.Boolean(), server_default='FALSE', nullable=False),
     sqlalchemy.Column('name', sqlalchemy.String(256), nullable=False, unique=True),
 )
 
