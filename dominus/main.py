@@ -13,7 +13,7 @@ def setup_db():
     engine = chryso.connection.Engine(db, dominus.tables)
     chryso.connection.store(engine)
 
-def run():
+def create_application():
     logging.basicConfig()
     logging.getLogger().setLevel(logging.DEBUG)
 
@@ -32,7 +32,10 @@ def run():
     app.register_blueprint(dominus.auth.blueprint)
     app.register_blueprint(dominus.views.blueprint)
     app.before_request(dominus.auth.require_login)
+    return app
 
+def run():
+    app = create_application()
     try:
         app.run(host='localhost', port=4554, debug=True)
     except KeyboardInterrupt:
