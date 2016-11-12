@@ -104,6 +104,7 @@ def main():
             'Flask==0.11.1',
             'Flask-Login==0.3.2',
             'Flask-User==0.6.8',
+            'PyYAML==3.12',
         ],
         extras_require={
             'develop': [

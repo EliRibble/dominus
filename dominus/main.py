@@ -5,11 +5,11 @@ import flask
 import flask_login
 
 import dominus.auth
+import dominus.config
 import dominus.tables
 import dominus.views
 
-def setup_db():
-    db = "postgres://dev:development@localhost:5432/dominus"
+def setup_db(db):
     engine = chryso.connection.Engine(db, dominus.tables)
     chryso.connection.store(engine)
 
@@ -17,9 +17,12 @@ def create_application():
     logging.basicConfig()
     logging.getLogger().setLevel(logging.DEBUG)
 
-    setup_db()
 
     app = flask.Flask('dominus')
+
+    config = dominus.config.get()
+    setup_db(config['db'])
+
     login_manager = flask_login.LoginManager()
     login_manager.init_app(app)
     login_manager.user_loader(dominus.auth.load_user)
