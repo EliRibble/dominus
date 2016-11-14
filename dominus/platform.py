@@ -75,22 +75,29 @@ def create_card(set_, name, cardtypes, cost_in_treasure, cost_in_debt, is_in_sup
     engine.execute(query)
     LOGGER.debug("Created %s in %s with types %s", name, set_.name, cardtypes)
 
-def create_kingdom(name, creator, cards):
+def create_kingdom(creator, values):
     engine = chryso.connection.get()
     with engine.atomic():
         all_cards = get_cards()
         cards_by_name = {card.name: card for card in all_cards}
-        query = dominus.tables.Kingdom.insert().values(name=name, creator=creator) # pylint: disable=no-value-for-parameter
+        query = dominus.tables.Kingdom.insert().values( # pylint: disable=no-value-for-parameter
+            creator         = creator,
+            has_colony      = values['has_colony'],
+            has_platinum    = values['has_platinum'],
+            has_shelters    = values['has_platinum'],
+            is_recommended  = False, # admins have to manually change this in the DB
+            name            = values['name'],
+        )
         _uuid = engine.execute(query).inserted_primary_key[0]
-        LOGGER.debug("Created kingdom %s (%s) by %s", name, _uuid, creator)
-        if not cards:
+        LOGGER.debug("Created kingdom %s (%s) by %s", values['name'], _uuid, creator)
+        if not values['cards']:
             return _uuid
         query = dominus.tables.KingdomCard.insert().values([{ # pylint: disable=no-value-for-parameter
             'card'      : cards_by_name[card].uuid,
             'kingdom'   : _uuid,
-        } for card in cards])
+        } for card in values['cards']])
         engine.execute(query)
-        LOGGER.debug("Added cards %s to kingdom %s", cards, _uuid)
+        LOGGER.debug("Added cards %s to kingdom %s", values['cards'], _uuid)
         return _uuid
 
 def create_kingdom_play_log(user, kingdom_uuid, arguments):

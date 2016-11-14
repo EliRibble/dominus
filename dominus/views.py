@@ -60,17 +60,24 @@ def add_kingdom_get():
 
 @blueprint.route('/kingdoms/add/', methods=['POST'])
 @parse({
-    'name'      : str,
+    'name'          : str,
 })
 def add_kingdom_post(arguments):
     LOGGER.debug("Got POST %s", arguments)
     cards = []
     for key, value in flask.request.form.items():
-        if key in ['name', 'creator']:
+        if key in ['has_colony', 'has_platinum', 'has_shelters', 'name']:
             continue
         cards.append(value)
     cards = [card for card in cards if card]
-    dominus.platform.create_kingdom(arguments['name'], flask.session['user_id'], cards)
+    values = {
+        'cards'         : cards,
+        'has_colony'    : arguments.get('has_colony', False),
+        'has_platinum'  : arguments.get('has_platinum', False),
+        'has_shelters'  : arguments.get('has_shelters', False),
+        'name'          : arguments['name'],
+    }
+    dominus.platform.create_kingdom(flask.session['user_id'], values)
     return flask.redirect('/kingdoms/')
 
 @blueprint.route('/kingdom/<uuid:kingdom_id>/delete/', methods=['POST'])
