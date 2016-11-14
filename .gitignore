@@ -87,3 +87,7 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# The virtualenv
+ve/
+dominus/static/css/
