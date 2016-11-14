@@ -1,0 +1,3 @@
+#!/usr/bin/env fish
+lessc dominus/static/less/dominus.less > dominus/static/css/dominus.css
+lessc dominus/static/less/rating.less > dominus/static/css/rating.css
