@@ -1,9 +1,11 @@
 {% extends 'layout.html' %}
 {% block main_content %}
 <h1>{{ kingdom.name }}</h1>
+{% if current_user.username == kingdom.creator %}
 <form action="/kingdom/{{ kingdom.uuid }}/delete/" method="POST">
   <input type="submit" value="Delete"/>
 </form>
+{% endif %}
 <ul class="kingdom-summary">
   <li>Creator: {{ kingdom.creator }}</li>
   <li>Created: {{ kingdom.created.strftime("%A %d %B %Y") }}</li>
