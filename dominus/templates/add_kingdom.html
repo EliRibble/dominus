@@ -38,9 +38,9 @@
   <h2>Extra Cards</h2>
   {% for i in range(3) %}
   <div class="card-group" style="display: inline-block">
-    <img id="event{{i}}img" src="/static/cards/card_back.jpg" width="150"/>
+    <img id="extra{{i}}img" src="/static/cards/card_back.jpg" width="150"/>
     <br>
-    <input id="event{{i}}" type="text" name="event-{{i}}" list="events" placeholder="Start typing..." onchange="onSelectCard(event)"></input>
+    <input id="extra{{i}}" type="text" name="extra-{{i}}" list="basecards" placeholder="Start typing..." onchange="onSelectCard(event)"></input>
   </div>
   {% endfor %}
 
@@ -55,7 +55,7 @@
 
   <datalist id="events">
     {% for card in cards %}
-      {% if card.type in ["event"] %}
+      {% if 'event' in card.types %}
         <option value="{{ card.name }}">{{ card.name }}</option>
       {% endif %}
     {% endfor %}
@@ -72,7 +72,7 @@
 
   <datalist id="landmarks">
     {% for card in cards %}
-      {% if card.type in ["landmark"] %}
+      {% if 'landmark' in card.types %}
         <option value="{{ card.name }}">{{ card.name }}</option>
       {% endif %}
     {% endfor %}
