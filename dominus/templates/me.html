@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block main_content %}
+<h1>User {{ current_user.username }}</h1>
+<h2>Recent Games</h2>
+<table>
+    <tr><th>When</th><th>Rating</th><th>Kingdom</th><th>Comments</th></tr>
+{% for kingdom_play in kingdom_plays %}
+    <tr>
+        <td>{{ kingdom_play.created.strftime("%A %d %B %Y") }}</td>
+        <td>{{ kingdom_play.rating }}</td>
+        <td><a href="/kingdom/{{ kingdom_play.kingdom_uuid }}/">{{ kingdom_play.kingdom_name }}</a></td>
+        <td>{{ kingdom_play.comments }}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}
+

@@ -37,6 +37,11 @@ def parse(args):
 def root():
     return flask.render_template('root.html')
 
+@blueprint.route('/me/', methods=['GET'])
+def me():
+    kingdom_plays = dominus.platform.get_kingdom_play_logs(flask.session['user_id'])
+    return flask.render_template('me.html', kingdom_plays=kingdom_plays)
+
 @blueprint.route('/admin/', methods=['GET'])
 def admin():
     sets = dominus.platform.get_sets()

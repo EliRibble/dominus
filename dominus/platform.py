@@ -22,6 +22,14 @@ Card = collections.namedtuple('Card', (
     'text',
     'uuid',
 ))
+KingdomPlay = collections.namedtuple('KingdomPlay', (
+     'comments',
+     'created',
+     'kingdom_name',
+     'kingdom_uuid',
+     'player_count',
+     'rating',
+))
 class Kingdom(): # pylint: disable=too-many-instance-attributes
     def __init__(self, name, created, creator, cards, _uuid):
         self.cards          = cards
@@ -55,6 +63,7 @@ class Kingdom(): # pylint: disable=too-many-instance-attributes
         for card in self.cards:
             results[card.cost_in_debt].append(card)
         return results
+
 
 def create_card(set_, name, cardtypes, cost_in_treasure, cost_in_debt, is_in_supply):
     engine = chryso.connection.get()
@@ -178,6 +187,27 @@ def get_cards(card_uuids=None):
         text             = row[dominus.tables.Card.c.text],
         types            = set(types_by_uuid[row[dominus.tables.Card.c.uuid]]),
         uuid             = row[dominus.tables.Card.c.uuid],
+    ) for row in rows]
+
+def get_kingdom_play_logs(user):
+    engine = chryso.connection.get()
+    query = (sqlalchemy.select([
+            dominus.tables.KingdomPlay,
+            dominus.tables.Kingdom.c.name,
+        ], use_labels=True).select_from(
+            dominus.tables.KingdomPlay.join(dominus.tables.Kingdom)
+        ).where(dominus.tables.KingdomPlay.c.creator == user)
+        .where(dominus.tables.Kingdom.c.deleted == None)
+        .order_by(dominus.tables.KingdomPlay.c.created.desc())
+    )
+    rows = engine.execute(query).fetchall()
+    return [KingdomPlay(
+        comments        = row[dominus.tables.KingdomPlay.c.comments],
+        created         = row[dominus.tables.KingdomPlay.c.created],
+        kingdom_uuid    = row[dominus.tables.KingdomPlay.c.kingdom],
+        kingdom_name    = row[dominus.tables.Kingdom.c.name],
+        player_count    = row[dominus.tables.KingdomPlay.c.player_count],
+        rating          = row[dominus.tables.KingdomPlay.c.rating],
     ) for row in rows]
 
 def _add_cards_to_kingdoms(kingdom_by_uuid):
