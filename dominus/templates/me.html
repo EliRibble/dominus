@@ -2,6 +2,16 @@
 
 {% block main_content %}
 <h1>User {{ current_user.username }}</h1>
+<h2>Sets Owned</h2>
+<table>
+    <tr><th>Set</th><th>Owned</th></tr>
+{% for set_owned in sets_owned %}
+    <tr>
+        <td>{{ set_owned.set_name }}</td>
+        <td>{{ set_owned.owned }}</td>
+    </tr>
+{% endfor %}
+</table>
 <h2>Recent Games</h2>
 <table>
     <tr><th>When</th><th>Rating</th><th>Kingdom</th><th>Comments</th></tr>

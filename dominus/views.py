@@ -40,7 +40,8 @@ def root():
 @blueprint.route('/me/', methods=['GET'])
 def me():
     kingdom_plays = dominus.platform.get_kingdom_play_logs(flask.session['user_id'])
-    return flask.render_template('me.html', kingdom_plays=kingdom_plays)
+    sets_owned = dominus.platform.get_sets_owned(flask.session['user_id'])
+    return flask.render_template('me.html', kingdom_plays=kingdom_plays, sets_owned=sets_owned)
 
 @blueprint.route('/admin/', methods=['GET'])
 def admin():

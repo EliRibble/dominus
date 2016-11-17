@@ -30,6 +30,13 @@ KingdomPlay = collections.namedtuple('KingdomPlay', (
      'player_count',
      'rating',
 ))
+SetOwned = collections.namedtuple('SetOwned', (
+    'owned',
+    'set_uuid',
+    'set_name',
+    'user',
+))
+
 class Kingdom(): # pylint: disable=too-many-instance-attributes
     def __init__(self, name, created, creator, cards, _uuid):
         self.cards          = cards
@@ -63,7 +70,6 @@ class Kingdom(): # pylint: disable=too-many-instance-attributes
         for card in self.cards:
             results[card.cost_in_debt].append(card)
         return results
-
 
 def create_card(set_, name, cardtypes, cost_in_treasure, cost_in_debt, is_in_supply):
     engine = chryso.connection.get()
@@ -209,6 +215,32 @@ def get_kingdom_play_logs(user):
         player_count    = row[dominus.tables.KingdomPlay.c.player_count],
         rating          = row[dominus.tables.KingdomPlay.c.rating],
     ) for row in rows]
+
+def get_sets_owned(user):
+    engine = chryso.connection.get()
+    query = sqlalchemy.select([
+        dominus.tables.Set.c.uuid,
+        dominus.tables.Set.c.name,
+    ])
+    rows = engine.execute(query).fetchall()
+    sets = {row[dominus.tables.Set.c.uuid]: row[dominus.tables.Set.c.name] for row in rows}
+
+    query = sqlalchemy.select([
+        dominus.tables.SetOwned.c.set,
+        dominus.tables.SetOwned.c.user,
+    ]).where(dominus.tables.SetOwned.c.user == user)
+    rows = engine.execute(query).fetchall()
+    owned = {row[dominus.tables.SetOwned.c.set] for row in rows}
+
+    results = []
+    for uuid, name in sets.items():
+        results.append(SetOwned(
+            set_uuid    = uuid,
+            set_name    = name,
+            user        = user,
+            owned       = uuid in owned,
+        ))
+    return sorted(results, key=lambda x: x.set_name)
 
 def _add_cards_to_kingdoms(kingdom_by_uuid):
     engine = chryso.connection.get()
