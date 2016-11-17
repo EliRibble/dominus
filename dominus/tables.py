@@ -15,6 +15,11 @@ Set = chryso.schema.table('set',
     sqlalchemy.Column('name', sqlalchemy.String(256), nullable=False),
 )
 
+SetOwned = chryso.schema.table("set_owned",
+    sqlalchemy.Column('user', None, sqlalchemy.ForeignKey('user.uuid'), nullable=False),
+    sqlalchemy.Column('set', None, sqlalchemy.ForeignKey('set.uuid'), nullable=False),
+)
+
 Card = chryso.schema.table('card',
     sqlalchemy.Column('cost_in_debt', sqlalchemy.Integer(), nullable=False),
     sqlalchemy.Column('cost_in_treasure', sqlalchemy.Integer(), nullable=False),
