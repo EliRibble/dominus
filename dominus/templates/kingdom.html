@@ -23,11 +23,11 @@
   <li>My Rating:
     <form id="rating-form" action="/kingdom/{{ kingdom.uuid }}/rating/" method="POST">
       <span class="star-rating">
-        <input type="radio" name="rating" value="1" {% if kingdom.rating_mine == 1 %}checked="checked"{% endif %}><i></i>
-        <input type="radio" name="rating" value="2" {% if kingdom.rating_mine == 2 %}checked="checked"{% endif %}><i></i>
-        <input type="radio" name="rating" value="3" {% if kingdom.rating_mine == 3 %}checked="checked"{% endif %}><i></i>
-        <input type="radio" name="rating" value="4" {% if kingdom.rating_mine == 4 %}checked="checked"{% endif %}><i></i>
-        <input type="radio" name="rating" value="5" {% if kingdom.rating_mine == 5 %}checked="checked"{% endif %}><i></i>
+        <input type="radio" name="rating" class="auto-submit" value="1" {% if kingdom.rating_mine == 1 %}checked="checked"{% endif %}><i></i>
+        <input type="radio" name="rating" class="auto-submit" value="2" {% if kingdom.rating_mine == 2 %}checked="checked"{% endif %}><i></i>
+        <input type="radio" name="rating" class="auto-submit" value="3" {% if kingdom.rating_mine == 3 %}checked="checked"{% endif %}><i></i>
+        <input type="radio" name="rating" class="auto-submit" value="4" {% if kingdom.rating_mine == 4 %}checked="checked"{% endif %}><i></i>
+        <input type="radio" name="rating" class="auto-submit" value="5" {% if kingdom.rating_mine == 5 %}checked="checked"{% endif %}><i></i>
       </span>
     </form>
   </li>
