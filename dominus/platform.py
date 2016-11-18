@@ -216,6 +216,15 @@ def get_kingdom_play_logs(user):
         rating          = row[dominus.tables.KingdomPlay.c.rating],
     ) for row in rows]
 
+def clear_sets_owned(user):
+    engine = chryso.connection.get()
+    query = (sqlalchemy.delete(
+        dominus.tables.SetOwned,
+    ).where(
+        dominus.tables.SetOwned.c.user == user,
+    ))
+    engine.execute(query)
+
 def get_sets_owned(user):
     engine = chryso.connection.get()
     query = sqlalchemy.select([
@@ -241,6 +250,18 @@ def get_sets_owned(user):
             owned       = uuid in owned,
         ))
     return sorted(results, key=lambda x: x.set_name)
+
+def set_sets_owned(user, my_sets):
+    engine = chryso.connection.get()
+    set_uuid_by_name = {set_.name: set_.uuid for set_ in get_sets()}
+    set_uuids = [set_uuid_by_name[my_set] for my_set in my_sets]
+
+    query = sqlalchemy.insert(dominus.tables.SetOwned).values([{
+        'user'  : user,
+        'set'   : set_uuid,
+    } for set_uuid in set_uuids])
+    engine.execute(query)
+    LOGGER.info("Set user %s to owning sets %s", user, my_sets)
 
 def _add_cards_to_kingdoms(kingdom_by_uuid):
     engine = chryso.connection.get()

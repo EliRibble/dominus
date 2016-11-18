@@ -43,6 +43,20 @@ def me():
     sets_owned = dominus.platform.get_sets_owned(flask.session['user_id'])
     return flask.render_template('me.html', kingdom_plays=kingdom_plays, sets_owned=sets_owned)
 
+@blueprint.route('/me/', methods=['POST'])
+def update_me():
+    dominus.platform.clear_sets_owned(flask.session['user_id'])
+    owned_sets = []
+    for key in flask.request.form.keys():
+        if key.startswith('own-set-'):
+            setname = key[len('own-set-'):]
+            owned_sets.append(setname)
+            LOGGER.debug("%s has set %s", flask.session['user_id'], setname)
+        else:
+            LOGGER.debug("Ignoring value %s", key)
+    dominus.platform.set_sets_owned(flask.session['user_id'], owned_sets)
+    return flask.redirect('/me/')
+
 @blueprint.route('/admin/', methods=['GET'])
 def admin():
     sets = dominus.platform.get_sets()
