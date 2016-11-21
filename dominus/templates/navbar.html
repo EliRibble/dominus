@@ -10,9 +10,15 @@
       <li><a href="/kingdoms/add" accesskey="a">Add</a></li>
       <li><a href="/me/" accesskey="m">Me</a></li>
       <li>
+        {% if current_user.is_anonymous %}
+        <form action="/login/" method="GET">
+          <input type="submit" value="Login"/>
+        </form>
+        {% else %}
         <form action="/login/" method="DELETE">
           <input type="submit" value="Logout {{ current_user.username }}"/>
         </form>
+        {% endif %}
       </li>
     </ul>
   </div>
