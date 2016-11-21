@@ -83,6 +83,8 @@ def add_kingdom_get():
     'name'          : str,
 })
 def add_kingdom_post(arguments):
+    if not flask.session.get('user_id'):
+        return flask.make_response("You have to be logged in to create kingdoms", 403)
     LOGGER.debug("Got POST %s", arguments)
     cards = []
     for key, value in flask.request.form.items():

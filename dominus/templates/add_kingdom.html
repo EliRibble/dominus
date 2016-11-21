@@ -1,6 +1,9 @@
 {% extends 'layout.html' %}
 
 {% block main_content %}
+{% if current_user.is_anonymous %}
+<p>You are not logged in, so you can't add a new kingdom. Try <a href="/login/">logging in first</a></p>
+{% else %}
 <h1>Add Kingdom</h1>
 <form method="POST" action="/kingdoms/add/">
   <div class="row">
@@ -82,5 +85,6 @@
     <input type="submit" value="Create Kingdom"></input>
   </div>
 </form>
+{% endif %}
 {% endblock %}
 
