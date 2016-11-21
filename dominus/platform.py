@@ -357,7 +357,8 @@ def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True):
     ) for row in rows]
     kingdom_by_uuid = {kingdom.uuid: kingdom for kingdom in kingdoms}
     _add_cards_to_kingdoms(kingdom_by_uuid)
-    _add_ratings_to_kingdoms(user, kingdom_by_uuid)
+    if user:
+        _add_ratings_to_kingdoms(user, kingdom_by_uuid)
     if include_play_logs:
         _add_play_logs_to_kingdoms(kingdom_by_uuid)
     return kingdoms
