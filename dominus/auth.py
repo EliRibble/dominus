@@ -71,10 +71,3 @@ class User():
 
 def load_user(user_id):
     return dominus.platform.user_by_uuid(user_id)
-
-def require_login():
-    LOGGER.debug("Current user %s", flask.session.get('user_id'))
-    if flask.request.path in ('/login/', '/register/'):
-        return
-    if not flask.session.get('user_id'):
-        return flask.redirect('/login/')

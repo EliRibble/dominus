@@ -34,7 +34,6 @@ def create_application():
 
     app.register_blueprint(dominus.auth.blueprint)
     app.register_blueprint(dominus.views.blueprint)
-    app.before_request(dominus.auth.require_login)
     return app
 
 def run():
