@@ -39,8 +39,12 @@ def root():
 
 @blueprint.route('/me/', methods=['GET'])
 def me():
-    kingdom_plays = dominus.platform.get_kingdom_play_logs(flask.session['user_id'])
-    sets_owned = dominus.platform.get_sets_owned(flask.session['user_id'])
+    if flask.session.get('user_id'):
+        kingdom_plays = dominus.platform.get_kingdom_play_logs(flask.session['user_id'])
+        sets_owned = dominus.platform.get_sets_owned(flask.session['user_id'])
+    else:
+        kingdom_plays = []
+        sets_owned = []
     return flask.render_template('me.html', kingdom_plays=kingdom_plays, sets_owned=sets_owned)
 
 @blueprint.route('/me/', methods=['POST'])

@@ -1,6 +1,9 @@
 {% extends 'layout.html' %}
 
 {% block main_content %}
+{% if current_user.is_anonymous %}
+<p>You are not currently logged in. In order to access this page you'll need to <a href="/login/">login first</a>
+{% else %}
 <h1>User {{ current_user.username }}</h1>
 <h2>Sets Owned</h2>
 <form method="POST" action="/me/">
@@ -34,5 +37,6 @@
     </tr>
 {% endfor %}
 </table>
+{% endif %}
 {% endblock %}
 
