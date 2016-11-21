@@ -74,7 +74,8 @@ def admin():
 
 @blueprint.route('/kingdoms/', methods=['GET'])
 def kingdoms():
-    _kingdoms = dominus.platform.get_kingdoms(flask.session['user_id'])
+    user_id = flask.session.get('user_id', None)
+    _kingdoms = dominus.platform.get_kingdoms(user_id)
     return flask.render_template('kingdoms.html', kingdoms=_kingdoms)
 
 @blueprint.route('/kingdoms/add/', methods=['GET'])
@@ -113,7 +114,8 @@ def kingdom_delete(kingdom_id):
 
 @blueprint.route('/kingdom/<uuid:kingdom_id>/', methods=['GET'])
 def kingdom_get(kingdom_id):
-    kingdom = dominus.platform.get_kingdoms(flask.session['user_id'], [kingdom_id])[0]
+    user_id = flask.session.get('user_id')
+    kingdom = dominus.platform.get_kingdoms(user_id, [kingdom_id])[0]
     return flask.render_template('kingdom.html', kingdom=kingdom)
 
 @blueprint.route('/kingdom/<uuid:kingdom_id>/play-log/', methods=['POST'])
