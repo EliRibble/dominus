@@ -1,9 +1,48 @@
 {% extends 'layout.html' %}
 {% block javascript %}
+<script type="application/javascript">
+function onCheckChange(cb) {
+  setTimeout(function() {
+    $("#filter-form").submit();
+    console.log("Clicked to set ", cb.name, cb.checked);
+  });
+}
+function queryURLFilterValues() {
+  var filters = {};
+  var args = window.location.search.substring(1);
+  var pairs = args.split('&');
+  for(var i = 0; i < pairs.length; i++) {
+    var pair = pairs[i].split("=");
+    filters[pair[1]] = true;
+  }
+  return filters;
+}
+$().ready(function() {
+  var filterValues = queryURLFilterValues();
+  var filterNames = ['only-my-kingdoms', 'have-not-played'];
+  for(var i = 0; i < filterNames.length; i++) {
+    var filterName = filterNames[i];
+    var input = $('input[value="' + filterName + '"]');
+    var filterEnabled = filterValues[filterName];
+    input[0].checked = !!filterEnabled;
+  }
+});
+</script>
 {% endblock %}
 
 {% block main_content %}
 <h1>Kingdoms</h1>
+<h2>Filters</h2>
+<form id="filter-form" method="GET" action="/kingdoms/">
+  <div class="row">
+    <div class="six columns">
+      <label for="only-my-kingdoms">Show only my sets</label>
+      <input type="checkbox" name="filter" value="only-my-kingdoms" onclick="onCheckChange(this)"></input>
+      <label for="have-not-played">Show only kings I haven't played</label>
+      <input type="checkbox" name="filter" value="have-not-played" onclick="onCheckChange(this)"></input>
+    </div>
+  </div>
+</form>
 {% for kingdom in kingdoms %}
 <div class="kingdom">
   <h2><a href="/kingdom/{{ kingdom.uuid }}/">{{ kingdom.name }}</a></h2>

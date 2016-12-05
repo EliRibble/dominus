@@ -333,7 +333,7 @@ def _add_play_logs_to_kingdoms(kingdom_by_uuid):
             'rating'   : row[dominus.tables.KingdomPlay.c.rating],
         })
 
-def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True):
+def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True, only_my_kingdoms=False, have_not_played=False):
     engine = chryso.connection.get()
 
     query = (sqlalchemy.select([

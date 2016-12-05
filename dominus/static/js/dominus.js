@@ -9,3 +9,4 @@ $(':radio.auto-submit').change(
     $('#rating-form').submit();
   }
 )
+

@@ -74,8 +74,15 @@ def admin():
 
 @blueprint.route('/kingdoms/', methods=['GET'])
 def kingdoms():
+    kwargs = {
+        'have_not_played'   : False,
+        'only_my_kingdoms'  : False,
+    }
+    for value in flask.request.args.getlist('filter'):
+        kwargs[value.replace('-', '_')] = True
+
     user_id = flask.session.get('user_id', None)
-    _kingdoms = dominus.platform.get_kingdoms(user_id)
+    _kingdoms = dominus.platform.get_kingdoms(user_id, **kwargs)
     return flask.render_template('kingdoms.html', kingdoms=_kingdoms)
 
 @blueprint.route('/kingdoms/add/', methods=['GET'])
