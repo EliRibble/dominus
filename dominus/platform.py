@@ -336,6 +336,7 @@ def _add_play_logs_to_kingdoms(kingdom_by_uuid):
 def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True, only_my_kingdoms=False, have_not_played=False):
     engine = chryso.connection.get()
 
+    sets_owned = get_sets_owned(user) if only_my_kingdoms else None
     query = (sqlalchemy.select([
         dominus.tables.Kingdom.c.created,
         dominus.tables.Kingdom.c.name,
@@ -345,6 +346,7 @@ def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True, only_my_kingd
         dominus.tables.Kingdom.join(dominus.tables.User)
     ).where(dominus.tables.Kingdom.c.deleted == None) # pylint: disable=singleton-comparison
     .order_by(dominus.tables.Kingdom.c.created.desc()))
+
     if kingdom_uuids:
         query = query.where(dominus.tables.Kingdom.c.uuid.in_(kingdom_uuids))
     rows = engine.execute(query).fetchall()
@@ -361,7 +363,13 @@ def get_kingdoms(user, kingdom_uuids=None, include_play_logs=True, only_my_kingd
         _add_ratings_to_kingdoms(user, kingdom_by_uuid)
     if include_play_logs:
         _add_play_logs_to_kingdoms(kingdom_by_uuid)
+    if only_my_kingdoms:
+        allowed_sets = {s.set_name for s in sets_owned if s.owned}
+        kingdoms = [k for k in kingdoms if _only_uses_sets(k, allowed_sets)]
     return kingdoms
+
+def _only_uses_sets(kingdom, allowed_sets):
+    return not kingdom.sets.difference(allowed_sets)
 
 def delete_kingdom(user, _uuid):
     engine = chryso.connection.get()
