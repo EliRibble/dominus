@@ -123,7 +123,8 @@ def kingdom_delete(kingdom_id):
 def kingdom_get(kingdom_id):
     user_id = flask.session.get('user_id')
     kingdom = dominus.platform.get_kingdoms(user_id, [kingdom_id])[0]
-    return flask.render_template('kingdom.html', kingdom=kingdom)
+    has_session = flask.session.get('user_id')
+    return flask.render_template('kingdom.html', has_session = has_session, kingdom=kingdom)
 
 @blueprint.route('/kingdom/<uuid:kingdom_id>/play-log/', methods=['POST'])
 @parse({

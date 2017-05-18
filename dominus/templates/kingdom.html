@@ -53,6 +53,7 @@
   {% endif %}
 {% endfor %}
 <h2>Log a play</h2>
+{% if has_session %}
 <p>If you've played this kingdom please tell us a bit about your experience for other players</p>
 <form id="play-form" method="POST" action="/kingdom/{{ kingdom.uuid }}/play-log/">
   <label for="player_count">Number of Players</label>
@@ -69,4 +70,7 @@
   <textarea maxlength="2000" name="comments" placeholder="One one decent strategy, great for many players, too much trashing, etc" rows="8" cols="100"></textarea>
   <input type="submit" value="I Played This!"></input>
 </form>
+{% else %}
+<p>Want to tell people about playing this kingdom? Great, you'll need a login. You can get one by <a href="/login/">logging in</a> or, you need to <a href="/register/">registering here</a></p>
+{% endif %}
 {% endblock %}
